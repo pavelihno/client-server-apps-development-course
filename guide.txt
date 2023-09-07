@@ -1,0 +1,5 @@
+# выбор директории
+cd practice_1
+
+# запуск кода 
+groovy -cp ../lib/* -D file.encoding=UTF8 main.groovy
