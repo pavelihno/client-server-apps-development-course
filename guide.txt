@@ -8,4 +8,4 @@ groovy -cp ../lib/* -D file.encoding=UTF8 main.groovy
 gradlew bootRun
 
 # запуск rsocket client
-groovy -cp ../lib/* -D file.encoding=UTF8 Client.groovy
+gradle run
