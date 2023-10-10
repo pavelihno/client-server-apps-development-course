@@ -3,3 +3,9 @@ cd practice_1
 
 # запуск кода 
 groovy -cp ../lib/* -D file.encoding=UTF8 main.groovy
+
+# запуск rsocket server
+gradlew bootRun
+
+# запуск rsocket client
+groovy -cp ../lib/* -D file.encoding=UTF8 Client.groovy
