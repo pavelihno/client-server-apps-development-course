@@ -16,9 +16,9 @@ import io.rsocket.transport.netty.server.TcpServerTransport
 class Application extends GrailsAutoConfiguration {
     
     static void main(String[] args) {
-        def context = GrailsApp.run(Application, args)
+        def context = GrailsApp.run(Application, args) 
 
-        RSocketServer.create(SocketAcceptor.with(new StockRSocket()))
+        RSocketServer.create(SocketAcceptor.with(context.getBean(StockRSocket)))
           .bind(TcpServerTransport.create("localhost", 7000))
           .subscribe()
 
