@@ -12,8 +12,8 @@ class StockService {
         } 
     }
 
-    def findStockByCompanyName(String companyName) {
-        Stock.findByCompanyName(companyName)
+    def findStocksByCompanyName(String companyName) {
+        return Stock.findAllByCompanyName(companyName)
     }
 
     def findStocksByPrice(Long price) {

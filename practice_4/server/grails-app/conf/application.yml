@@ -1,6 +1,6 @@
 info:
   app:
-    name: taskManagement
+    name: stockManagement
     version: '0.1'
     grailsVersion: 6.0.0
 grails:

@@ -6,6 +6,7 @@ import io.rsocket.RSocket
 import io.rsocket.Payload
 import io.rsocket.util.DefaultPayload
 import io.rsocket.core.RSocketConnector
+import io.rsocket.core.RSocketClient
 import io.rsocket.transport.netty.client.TcpClientTransport
 
 public class Client {
@@ -17,8 +18,7 @@ public class Client {
             sendFireAndForgetRequest(rSocket, "Tesla", 150)
 
             // request-response
-            String response = sendRequestResponse(rSocket, "Apple")
-            println "Response from server: ${response}"
+            sendRequestResponse(rSocket, "Apple")
 
             // request-stream
             sendRequestStream(rSocket, "150")
@@ -26,10 +26,12 @@ public class Client {
             // channel
             sendChannelRequest(rSocket)
 
+            Thread.sleep(10000)
+
             rSocket.dispose()
-        
+            
         } catch (Exception e) {
-            println "Failed to connect to the RSocket server: ${e.message}"
+            // println "Failed to connect to the RSocket server: ${e.message}"
             throw e
         }
     }
@@ -39,23 +41,20 @@ public class Client {
     }
 
     private static void sendFireAndForgetRequest(RSocket rSocket, String companyName, long price) {
-        String stockData = "${companyName};${price}"
-        Payload payload = DefaultPayload.create(stockData)
-        rSocket.fireAndForget(payload).block()
+        rSocket.fireAndForget(DefaultPayload.create("${companyName};${price}")).block()
     }
 
-    private static String sendRequestResponse(RSocket rSocket, String requestData) {
-        Payload requestPayload = DefaultPayload.create(requestData)
-        Payload responsePayload = rSocket.requestResponse(requestPayload).block()
-        println responsePayload
-        // return responsePayload.getDataUtf8()
+    private static void sendRequestResponse(RSocket rSocket, String companyName) {
+        rSocket.requestResponse(DefaultPayload.create(companyName))
+            .map(Payload::getDataUtf8)
+            .doOnNext(response -> println "Response from server: ${response.getDataUtf8()}")
+            .subscribe()
     }
 
     private static void sendRequestStream(RSocket rSocket, String price) {
-        Payload streamPayload = DefaultPayload.create(price)
-        rSocket.requestStream(streamPayload)
-            .doOnNext(response -> println "Stream response from server: ${response.getDataUtf8()}")
-            .blockLast()
+        rSocket.requestStream(DefaultPayload.create(price))
+            .doOnNext(response -> println "Response from server: ${response.getDataUtf8()}")
+            .subscribe()
     }
 
     private static void sendChannelRequest(RSocket rSocket) {
@@ -63,10 +62,10 @@ public class Client {
             DefaultPayload.create("Data1"),
             DefaultPayload.create("Data2"),
             DefaultPayload.create("Data3")
-        );
+        )
 
         rSocket.requestChannel(payloads)
-            .doOnNext(response -> println "Channel response from server: ${response.getDataUtf8()}")
-            .blockLast();
+            .doOnNext(response -> println "Response from server: ${response.getDataUtf8()}")
+            .subscribe()
     }
 }

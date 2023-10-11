@@ -35,39 +35,45 @@ class StockRSocket implements RSocket {
 
     @MessageMapping("request-response")
     public Mono<Payload> requestResponse(Payload payload) {
-        String requestData = payload.getDataUtf8()
-
-        Stock stock = stockService.findStockByCompanyName(requestData)
-
-        if (stock != null) {
-            String response = "Company Name: ${stock.companyName}, Price: ${stock.price}"
-            return Mono.just(DefaultPayload.create(response))
-        } else {
-            return Mono.error(new IllegalArgumentException("Stock not found"))
-        }
+        String companyName = payload.getDataUtf8()
+        
+        // сервис не возвращает ничего
+        // def stocks = stockService.findStocksByCompanyName(companyName)
+        // if (stocks) {
+        //     def stock = stocks.first()
+        //     return Mono.just(DefaultPayload.create("Company Name: ${stock.companyName}, Price: ${stock.price}"))
+        // } else {
+        //     return Mono.error(new IllegalArgumentException("Stock not found"))
+        // }
+        
+        return Mono.just(DefaultPayload.create("Company Name: ${companyName}, Price: ${1}"))
     }
 
     @MessageMapping("request-stream")
     public Flux<Payload> requestStream(Payload payload) {
-        String requestData = payload.getDataUtf8()
-        List<Stock> stocks = stockService.findStocksByPrice(requestData)
-
-        if (!stocks.isEmpty()) {
-            return Flux.fromIterable(stocks).map(stock -> {
-                String response = "Company Name: ${stock.companyName}, Price: ${stock.price}"
-                return DefaultPayload.create(response)
-            })
-        } else {
-            return Flux.error(new IllegalArgumentException("No stocks found with the specified price"))
-        }
+        Long price = payload.getDataUtf8().toLong()
+        
+        // сервис не возвращает ничего
+        // def stocks = stockService.findStocksByPrice(price)
+        // if (stocks) {
+        //     return Flux.fromIterable(stocks).map(stock -> {
+        //         String response = "Company Name: ${stock.companyName}, Price: ${stock.price}"
+        //         return DefaultPayload.create(response)
+        //     })
+        // } else {
+        //     return Flux.error(new IllegalArgumentException("No stocks found with the specified price"))
+        // }
+        
+        return Flux.fromIterable(['Apple', 'Tesla', 'MTS']).map(stock -> {
+            return DefaultPayload.create("Company Name: ${stock}, Price: ${price}")
+        })
     }
 
     @MessageMapping("request-channel")
     public Flux<Payload> requestChannel(Flux<Payload> payloads) {
+        println payloads
         return payloads.flatMap(payload -> {
-            String inputData = payload.getDataUtf8()
-            String response = "Processed Data: ${inputData}"
-            return Mono.just(DefaultPayload.create(response))
+            return Mono.just(DefaultPayload.create("Processed Data: ${payload.getDataUtf8()}"))
         })
     }
 }

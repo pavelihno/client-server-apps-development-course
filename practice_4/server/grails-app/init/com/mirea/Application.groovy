@@ -18,7 +18,7 @@ class Application extends GrailsAutoConfiguration {
     static void main(String[] args) {
         def context = GrailsApp.run(Application, args) 
 
-        RSocketServer.create(SocketAcceptor.with(context.getBean(StockRSocket)))
+        def server = RSocketServer.create(SocketAcceptor.with(context.getBean(StockRSocket)))
           .bind(TcpServerTransport.create("localhost", 7000))
           .subscribe()
 
