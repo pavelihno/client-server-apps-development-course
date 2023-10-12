@@ -3,6 +3,7 @@ package com.mirea
 import org.springframework.stereotype.Component
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.messaging.handler.annotation.MessageMapping
+import org.reactivestreams.Publisher
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.util.annotation.Nullable
@@ -70,9 +71,10 @@ class StockRSocket implements RSocket {
     }
 
     @MessageMapping("request-channel")
-    public Flux<Payload> requestChannel(Flux<Payload> payloads) {
-        println payloads
-        return payloads.flatMap(payload -> {
+    public Flux<Payload> requestChannel(Publisher<Payload> payloads) {
+        Flux<Payload> payloadFlux = Flux.from(payloads)
+
+        return payloadFlux.flatMap(payload -> {
             return Mono.just(DefaultPayload.create("Processed Data: ${payload.getDataUtf8()}"))
         })
     }

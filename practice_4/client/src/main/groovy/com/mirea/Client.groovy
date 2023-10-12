@@ -2,6 +2,7 @@ package com.mirea
 
 import reactor.core.publisher.Mono
 import reactor.core.publisher.Flux
+import org.reactivestreams.Publisher
 import io.rsocket.RSocket
 import io.rsocket.Payload
 import io.rsocket.util.DefaultPayload
@@ -15,13 +16,13 @@ public class Client {
             RSocket rSocket = connectToRSocketServer()
 
             // fire-and-forget
-            sendFireAndForgetRequest(rSocket, "Tesla", 150)
+            // sendFireAndForgetRequest(rSocket, "Tesla", 150)
 
             // request-response
-            sendRequestResponse(rSocket, "Apple")
+            // sendRequestResponse(rSocket, "Apple")
 
             // request-stream
-            sendRequestStream(rSocket, "150")
+            // sendRequestStream(rSocket, "150")
 
             // channel
             sendChannelRequest(rSocket)
@@ -46,7 +47,6 @@ public class Client {
 
     private static void sendRequestResponse(RSocket rSocket, String companyName) {
         rSocket.requestResponse(DefaultPayload.create(companyName))
-            .map(Payload::getDataUtf8)
             .doOnNext(response -> println "Response from server: ${response.getDataUtf8()}")
             .subscribe()
     }
@@ -58,11 +58,11 @@ public class Client {
     }
 
     private static void sendChannelRequest(RSocket rSocket) {
-        Flux<Payload> payloads = Flux.just(
+        Publisher<Payload> payloads = Flux.fromIterable(Arrays.asList(
             DefaultPayload.create("Data1"),
             DefaultPayload.create("Data2"),
             DefaultPayload.create("Data3")
-        )
+        ))
 
         rSocket.requestChannel(payloads)
             .doOnNext(response -> println "Response from server: ${response.getDataUtf8()}")
