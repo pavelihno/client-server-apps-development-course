@@ -11,10 +11,7 @@ class FileSystemController {
     String uploadPath
 
     @PostConstruct
-    def init() {
-        // def appBasePath = grailsApplication.mainContext.servletContext.getRealPath('/')
-        // def storagePath = grailsApplication.config.filesystem.path
-        
+    def init() {        
         uploadPath = grailsApplication.config.filesystem.path
     }
 

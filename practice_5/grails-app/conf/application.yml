@@ -58,7 +58,7 @@ grails:
         maxRequestSize: 10MB
   
 filesystem:
-  path: 'C:/Users/Pavel/Desktop/STUDYING/РКСП/practice_5/storage/'
+  path: '/app/storage/'
 
 server:
   port: 8080
