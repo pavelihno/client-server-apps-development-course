@@ -14,4 +14,10 @@ gradle run
 docker build -t dfs .
 
 # запуск контейнера
-docker run -it -p 8080:8080 --name dfs dfs
+docker run -it -v /storage:/app/storage -p 8080:8080 --name dfs dfs
+
+# сборка compose
+docker-compose build
+
+# запуск compose
+docker-compose up

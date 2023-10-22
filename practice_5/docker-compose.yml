@@ -2,24 +2,31 @@ version: '3'
 
 services:
   app1:
-    build: .
+    image: dfs
     volumes:
       - storage:/app/storage
     
   app2:
-    build: .
+    image: dfs
     volumes:
       - storage:/app/storage
   
   app3:
-    build: .
+    image: dfs
     volumes:
       - storage:/app/storage
 
   app4:
-    build: .
+    image: dfs
     volumes:
       - storage:/app/storage
+  
+  nginx:
+    image: nginx:latest
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
 
 volumes:
   storage:
