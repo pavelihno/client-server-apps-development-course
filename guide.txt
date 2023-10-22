@@ -9,3 +9,9 @@ gradlew bootRun
 
 # запуск rsocket client
 gradle run
+
+# сборка образа
+docker build -t dfs .
+
+# запуск контейнера
+docker run -it -p 8080:8080 --name dfs dfs
