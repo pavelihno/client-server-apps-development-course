@@ -1,0 +1,8 @@
+applicationType: rest_api
+defaultPackage: com.mirea
+testFramework: junit
+sourceLanguage: groovy
+buildTool: gradle
+gormImpl: gorm-hibernate5
+servletImpl: NONE
+features: [app-name, base, gorm-hibernate5, gradle, grails-application, grails-console, grails-dependencies, grails-gorm-testing-support, grails-gradle-plugin, grails-url-mappings, grails-web, h2, junit, logback, micronaut-inject-groovy, readme, spring-boot-autoconfigure, spring-boot-starter, views-json, views-json-testing-support, yaml]
