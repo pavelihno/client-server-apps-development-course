@@ -1,8 +1,10 @@
 package com.mirea
 
 import grails.gorm.transactions.Transactional
-
 import org.springframework.web.bind.annotation.*
+import org.springframework.http.ResponseEntity
+
+import reactor.core.publisher.BufferOverflowStrategy
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
@@ -21,51 +23,58 @@ class BookController {
 
     static responseFormats = ['json']
 
-    def list() {
-        def books = Book.list()
-        respond([result: books, count: books.size()])
+    Flux<Book> list() {
+        def books = []
+        
+        String author = params.author
+        Integer publishedYear = params.publishedYear as Integer
+
+        if (author && publishedYear) {
+            books = Book.findAllByPublishedYearAndAuthor(publishedYear, author)
+        } 
+        else if (author) {
+            books = Book.findAllByAuthor(author)
+        }
+        else if (publishedYear) {
+            books = Book.findAllByPublishedYear(publishedYear)
+        } 
+        else {
+            books = Book.findAll()
+
+        }
+        return Flux.fromIterable(books).onBackpressureBuffer(3, () -> {}, BufferOverflowStrategy.ON_OVERFLOW_DROP_OLDEST)
     }
 
-    def create(@RequestBody Book book) {   
-        if (book.validate()) {
+    Mono<ResponseEntity<Book>> create(@RequestBody Book book) {   
+        return Mono.fromCallable {
             book.save(flush: true)
-            respond([result: [book], count: 1])
-        } else {
-            respond([error: 'Указаны некорректные данные', status: 400])
         }
+        .map { newBook -> ResponseEntity.ok(newBook) }
+        .onErrorReturn('Указаны некорректные данные')
     }
 
-    def get(@PathVariable("id") Long id) {
-        def book = Book.get(id)
-        if (book) {
-            respond([result: [book], count: 1])
-        } else {
-            respond([error: 'Не найдено', status: 404])
-        }
+    Mono<ResponseEntity<Book>> get(@PathVariable("id") Long id) {
+        return Mono.justOrEmpty(Book.get(id))
+            .map(book -> ResponseEntity.ok(book))
+            .defaultIfEmpty(ResponseEntity.notFound().build())
     }
 
-    def update(@PathVariable("id") Long id, @RequestBody Book book) {
-        def existingBook = Book.get(id)
-        if (existingBook) {
-            if (book.validate()) {
+    Mono<ResponseEntity<Book>> update(@PathVariable("id") Long id, @RequestBody Book book) {
+        return Mono.justOrEmpty(Book.get(id))
+            .map { existingBook ->
                 existingBook.properties = book.properties
                 existingBook.save(flush: true)
-                respond([result: [existingBook], count: 1])
-            } else {
-                respond([error: 'Указаны некорректные данные', status: 400])
             }
-        } else {
-            respond([error: 'Не найдено', status: 404])
-        }
+            .onErrorReturn('Указаны некорректные данные')
+            .defaultIfEmpty(ResponseEntity.notFound().build())
     }
 
-    def delete(@PathVariable("id") Long id) {
-        def book = Book.get(id)
-        if (book) {
-            book.delete(flush: true)
-            respond([result: [book], count: 1])
-        } else {
-            respond([error: 'Не найдено', status: 404])
-        }
+    Mono<ResponseEntity<Book>> delete(@PathVariable("id") Long id) {
+        return Mono.justOrEmpty(Book.get(id))
+            .map { book ->
+                book.delete(flush: true)
+            }
+            .onErrorReturn('Указаны некорректные данные')
+            .defaultIfEmpty(ResponseEntity.notFound().build())
     }
 }
