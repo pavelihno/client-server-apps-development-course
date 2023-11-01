@@ -38,6 +38,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-tomcat")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.postgresql:postgresql")
+    implementation("io.projectreactor:reactor-core")
     console("org.grails:grails-console")
 }
 
