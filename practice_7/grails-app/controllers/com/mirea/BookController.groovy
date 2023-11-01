@@ -7,28 +7,26 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 
+@Transactional
 @RestController
 class BookController {
 
     static allowedMethods = [
         list: "GET",
         create: "POST",
-        read: "GET",
+        get: "GET",
         update: "PUT",
         delete: "DELETE"
     ]
 
     static responseFormats = ['json']
 
-    @Transactional
     def list() {
         def books = Book.list()
         respond([result: books, count: books.size()])
     }
 
-
-    @Transactional
-    def create(@RequestBody Book book) {
+    def create(@RequestBody Book book) {   
         if (book.validate()) {
             book.save(flush: true)
             respond([result: [book], count: 1])
@@ -37,8 +35,7 @@ class BookController {
         }
     }
 
-    @Transactional
-    def read(@PathVariable("id") Long id) {
+    def get(@PathVariable("id") Long id) {
         def book = Book.get(id)
         if (book) {
             respond([result: [book], count: 1])
@@ -47,7 +44,6 @@ class BookController {
         }
     }
 
-    @Transactional
     def update(@PathVariable("id") Long id, @RequestBody Book book) {
         def existingBook = Book.get(id)
         if (existingBook) {
@@ -63,7 +59,6 @@ class BookController {
         }
     }
 
-    @Transactional
     def delete(@PathVariable("id") Long id) {
         def book = Book.get(id)
         if (book) {
