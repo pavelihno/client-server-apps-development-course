@@ -1,0 +1,18 @@
+plugins {
+    id 'groovy'
+    id 'application'
+}
+
+repositories {
+    mavenCentral()
+    maven { url "https://repo.grails.org/grails/core/" }
+}
+
+dependencies {
+    implementation("org.apache.groovy:groovy-all:4.0.14")
+    implementation("org.springframework:spring-webflux:6.0.13")
+}
+
+application {
+    mainClass = 'com.mirea.Client' 
+}
