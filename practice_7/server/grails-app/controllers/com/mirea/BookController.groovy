@@ -24,7 +24,7 @@ class BookController {
     static responseFormats = ['json']
 
     Flux<Book> list() {
-        def books = []
+        def books
         
         String author = params.author
         Integer publishedYear = params.publishedYear as Integer
@@ -40,12 +40,16 @@ class BookController {
         } 
         else {
             books = Book.findAll()
-
         }
-        return Flux.fromIterable(books).onBackpressureBuffer(3, () -> {}, BufferOverflowStrategy.ON_OVERFLOW_DROP_OLDEST)
+        
+        println books.collect { "${it.title}, ${it.author}, ${it.publishedYear}" }.join('; ')
+
+        return Flux.fromIterable(books)
     }
 
     Mono<ResponseEntity<Book>> create(@RequestBody Book book) {   
+        println "CREATE: ${book.title}, ${book.author} ${book.publishedYear}"
+
         return Mono.fromCallable {
             book.save(flush: true)
         }
@@ -54,12 +58,16 @@ class BookController {
     }
 
     Mono<ResponseEntity<Book>> get(@PathVariable("id") Long id) {
+        println "GET: ${id}"
+
         return Mono.justOrEmpty(Book.get(id))
             .map(book -> ResponseEntity.ok(book))
             .defaultIfEmpty(ResponseEntity.notFound().build())
     }
 
     Mono<ResponseEntity<Book>> update(@PathVariable("id") Long id, @RequestBody Book book) {
+        println "UPDATE: ${id}; ${book.title}, ${book.author} ${book.publishedYear}"
+
         return Mono.justOrEmpty(Book.get(id))
             .map { existingBook ->
                 existingBook.properties = book.properties
@@ -70,6 +78,8 @@ class BookController {
     }
 
     Mono<ResponseEntity<Book>> delete(@PathVariable("id") Long id) {
+       println "DELETE: ${id}"
+        
         return Mono.justOrEmpty(Book.get(id))
             .map { book ->
                 book.delete(flush: true)
